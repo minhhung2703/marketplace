@@ -1,0 +1,33 @@
+{
+  "name": "fiver",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^2.3.1",
+    "@stripe/stripe-js": "^2.1.7",
+    "@types/node": "^20.8.3",
+    "@types/react": "^18.2.25",
+    "@types/react-dom": "^18.2.11",
+    "axios": "^1.5.1",
+    "firebase": "^10.4.0",
+    "next": "latest",
+    "react": "latest",
+    "react-cookie": "^6.1.1",
+    "react-dom": "latest",
+    "react-icons": "^4.11.0",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "latest",
+    "eslint": "^8.51.0",
+    "eslint-config-next": "^13.5.4",
+    "postcss": "latest",
+    "tailwindcss": "latest"
+  }
+}
