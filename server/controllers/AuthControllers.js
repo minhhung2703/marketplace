@@ -5,7 +5,6 @@ const { StatusCodes } = require("http-status-codes");
 const createTokenUser = require("../utils/createTokenUser");
 const { attackCookieToResponse } = require("../utils/jwt");
 const fs = require('fs')
-const cloudinary = require('cloudinary').v2
 
 const generatePassword = async (password) => {
     const salt = await bcrypt.genSalt();
@@ -135,37 +134,23 @@ const setUserInfo = async (req, res, next) => {
 }
 
 const setUserImage = async (req, res, next) => {
-    try {
-        if (req.files) {
-            console.log(req.files)
-            if (req?.user) {
-                const fileName = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
-                    use_filename: true,
-                    folder: 'file-upload',
-                })
-                fs.unlinkSync(req.files.image.tempFilePath)
-                await prisma.user.update({
-                    where: { id: req.user.userId },
-                    data: { profileImage: fileName }
-                })
-                res.status(StatusCodes.OK).json({ img: { src: fileName.secure_url } })
+    if (req.file) {
+        console.log(req.file)
+        if (req?.user) {
+            const date = Date.now();
+            let fileName = "uploads/profiles/" + date + req.file.originalname;
+            fs.renameSync(req.file.path, fileName);
+            const prisma = new PrismaClient();
 
-                // let fileName = "uploads/profiles/" + req.files.image;
-                // fs.renameSync(req.file.path, fileName);
-                // const prisma = new PrismaClient();
-
-                // await prisma.user.update({
-                //     where: { id: req.user.userId },
-                //     data: { profileImage: fileName },
-                // });
-                // return res.status(StatusCodes.OK).json({ img: fileName });
-            }
-            throw new CustomError.BadRequestError("cookie Error");
+            await prisma.user.update({
+                where: { id: req.user.userId },
+                data: { profileImage: fileName },
+            });
+            return res.status(StatusCodes.OK).json({ img: fileName });
         }
-        throw new CustomError.BadRequestError("Image not include");
-    } catch (error) {
-        console.log(error)
+        throw new CustomError.BadRequestError("Cookie Error.")
     }
+    throw new CustomError.BadRequestError("Image not include")
 }
 
 module.exports = {

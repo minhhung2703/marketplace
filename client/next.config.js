@@ -1,10 +1,9 @@
-require("dotenv").config({
-    path: ".env",
-});
+// require("dotenv").config({
+//     path: ".env",
+// });
 
 console.log(process.env.SERVER_URL);
-
-/** @type {import('next').NextConfig} */
+/**@type {import('next').NextConfig}*/
 const nextConfig = {
     reactStrictMode: true,
     images: {
