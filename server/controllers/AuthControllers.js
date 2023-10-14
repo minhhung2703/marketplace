@@ -1,4 +1,4 @@
-const { Prisma, PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const CustomError = require("../errors");
 const { StatusCodes } = require("http-status-codes");

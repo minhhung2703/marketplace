@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { useStateProvider } from "@/context/StateContext";
 import Image from "next/image";
 import axios from "axios";
+import { reducerCases } from "@/context/constants";
 
 const Profile = () => {
   const router = useRouter();
