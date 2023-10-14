@@ -38,27 +38,41 @@ const addGig = async (req, res) => {
     throw new CustomError.BadRequestError("All properties should be required")
 }
 
-const checkGigOrder = async () => {
+const getUserAuthGigs = async (req, res) => {
+    // try {
+    if (req.user) {
+        const prisma = new PrismaClient();
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.userId },
+            include: { gigs: true },
+        })
+        res.status(StatusCodes.OK).json({ gigs: user?.gigs ?? [] });
+    }
+    throw new CustomError.BadRequestError('UserId should be required')
+    // } catch (error) {
+    //     console.log(error)
+    // }
+
+}
+
+const checkGigOrder = async (req, res) => {
     res.status(200).json('check Gig Order')
 }
 
-const editGig = async () => {
+const editGig = async (req, res) => {
     res.status(200).json('edit Gig')
 }
 
-const getGigData = async () => {
+const getGigData = async (req, res) => {
     res.status(200).json('get Gig Data')
 }
 
-const getUserAuthGigs = async () => {
-    res.status(200).json('get User Auth Gigs')
-}
 
-const searchGigs = async () => {
+const searchGigs = async (req, res) => {
     res.status(200).json('search Gigs')
 }
 
-const addReview = async () => {
+const addReview = async (req, res) => {
     res.status(200).json('add Review')
 }
 
