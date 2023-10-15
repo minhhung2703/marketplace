@@ -39,41 +39,36 @@ const addGig = async (req, res) => {
 }
 
 const getUserAuthGigs = async (req, res) => {
-    // try {
     if (req.user) {
         const prisma = new PrismaClient();
         const user = await prisma.user.findUnique({
             where: { id: req.user.userId },
             include: { gigs: true },
-        })
-        res.status(StatusCodes.OK).json({ gigs: user?.gigs ?? [] });
+        });
+        res.status(StatusCodes.OK).json({ user });
     }
     throw new CustomError.BadRequestError('UserId should be required')
-    // } catch (error) {
-    //     console.log(error)
-    // }
-
 }
 
 const checkGigOrder = async (req, res) => {
-    res.status(200).json('check Gig Order')
+    res.send('check Gig Order')
 }
 
 const editGig = async (req, res) => {
-    res.status(200).json('edit Gig')
+    res.send('edit Gig')
 }
 
 const getGigData = async (req, res) => {
-    res.status(200).json('get Gig Data')
+    res.send('get Gig Data')
 }
 
 
 const searchGigs = async (req, res) => {
-    res.status(200).json('search Gigs')
+    res.send('search Gigs')
 }
 
 const addReview = async (req, res) => {
-    res.status(200).json('add Review')
+    res.send('add Review')
 }
 
 module.exports = {

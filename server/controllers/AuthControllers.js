@@ -135,10 +135,9 @@ const setUserInfo = async (req, res, next) => {
 
 const setUserImage = async (req, res, next) => {
     if (req.file) {
-        console.log(req.file)
         if (req?.user) {
             const date = Date.now();
-            let fileName = "uploads/profiles/" + date + req.file.originalname;
+            let fileName = `/uploads/profiles/` + date + req.file.originalname;
             fs.renameSync(req.file.path, fileName);
             const prisma = new PrismaClient();
 
