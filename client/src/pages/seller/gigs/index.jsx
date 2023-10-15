@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { GET_USER_GIGS_ROUTE } from "@/utils/constants";
 import axios from "axios";
 import Link from "next/link";
-import { GET_USER_GIGS_ROUTE } from "@/utils/constants";
+import React, { useState, useEffect } from "react";
 
 const Index = () => {
   const [gigs, setGigs] = useState([]);
@@ -48,32 +48,33 @@ const Index = () => {
             </tr>
           </thead>
           <tbody>
-            {gigs.map(({ title, category, price, deliveryTime, id }) => {
-              return (
-                <tr
-                  className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  key={id}
-                >
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            {gigs &&
+              gigs.map(({ title, category, price, deliveryTime, id }) => {
+                return (
+                  <tr
+                    className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    key={id}
                   >
-                    {title}
-                  </th>
-                  <td className="px-6 py-4">{category}</td>
-                  <td className="px-6 py-4">{price}</td>
-                  <td className="px-6 py-4">{deliveryTime}</td>
-                  <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/seller/gigs/${id}`}
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
+                      {title}
+                    </th>
+                    <td className="px-6 py-4">{category}</td>
+                    <td className="px-6 py-4">{price}</td>
+                    <td className="px-6 py-4">{deliveryTime}</td>
+                    <td className="px-6 py-4 text-right">
+                      <Link
+                        href={`/seller/gigs/${id}`}
+                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      >
+                        Edit
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>
