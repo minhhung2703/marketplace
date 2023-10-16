@@ -106,6 +106,19 @@ const getUserInfo = async (req, res, next) => {
 
 const setUserInfo = async (req, res, next) => {
     try {
+        if (req.file) {
+            if (req?.user) {
+                const date = Date.now();
+                let fileName = `uploads/profiles/` + date + req.file.originalname;
+                fs.renameSync(req.file.path, fileName);
+                const prisma = new PrismaClient();
+
+                await prisma.user.update({
+                    where: { id: req.user.userId },
+                    data: { profileImage: fileName },
+                });
+            }
+        }
         if (req?.user) {
             const { userName, fullName, description } = req.body;
             if (userName && fullName && description) {

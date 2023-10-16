@@ -18,7 +18,7 @@ router.route("/login").post(login);
 router.route("/logout").get(logout);
 
 router.route("/get-user-info").post(authenticateUsers, getUserInfo);
-router.route("/set-user-info").post(authenticateUsers, setUserInfo);
+router.route("/set-user-info").post(authenticateUsers, upload.single("images"), setUserInfo);
 router.route("/set-user-image").post(authenticateUsers, upload.single("images"), setUserImage);
 // router.route("/set-user-image").post(authenticateUsers, setUserImage);
 

@@ -62,35 +62,33 @@ const Profile = () => {
 
   const setProfile = async () => {
     try {
+      let imageName = "";
+      if (image) {
+        const formData = new FormData();
+        formData.append("images", image);
+        const {
+          data: { img },
+        } = await axios.post(SET_USER_IMAGE, formData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        imageName = img;
+      }
       const response = await axios.post(
         SET_USER_INFO,
-        { ...data },
+        { ...data, image: imageName.length ? HOST + "/" + imageName : false },
         { withCredentials: true }
       );
       if (response.data.userNameError) {
         setErrorMessage("Enter a Unique Username");
       } else {
-        let imageName = "";
-        if (image) {
-          const formData = new FormData();
-          formData.append("images", image);
-          const {
-            data: { img },
-          } = await axios.post(SET_USER_IMAGE, formData, {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          imageName = img;
-        }
-
         dispatch({
           type: reducerCases.SET_USER,
           userInfo: {
             ...userInfo,
             ...data,
-            image: imageName.length ? HOST + "/" + imageName : false,
           },
         });
 
