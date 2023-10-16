@@ -22,7 +22,7 @@ const errorHandleMiddler = (err, req, res, next) => {
         customError.statusCode = 404
     }
 
-    res.status(customError.statusCode).json({ msg: customError.msg });
+    return res.status(customError.statusCode).json({ msg: customError.msg });
 }
 
 module.exports = errorHandleMiddler

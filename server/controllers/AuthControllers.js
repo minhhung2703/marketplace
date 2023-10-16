@@ -105,31 +105,42 @@ const getUserInfo = async (req, res, next) => {
 }
 
 const setUserInfo = async (req, res, next) => {
-    if (req?.user) {
-        const { userName, fullName, description } = req.body;
-        if (userName && fullName && description) {
-            const prisma = new PrismaClient();
-            const userNameValid = await prisma.user.findUnique({
-                where: { username: userName },
-            });
+    try {
+        if (req?.user) {
+            const { userName, fullName, description } = req.body;
+            if (userName && fullName && description) {
+                const prisma = new PrismaClient();
+                const userNameValid = await prisma.user.findUnique({
+                    where: { username: userName },
+                });
 
-            if (userNameValid) {
-                res.status(StatusCodes.OK).json({ userNameError: true })
-            }
-
-            await prisma.user.update({
-                where: { id: req.user.userId },
-                data: {
-                    username: userName,
-                    fullName,
-                    description,
-                    isProfileInfoSet: true,
+                if (userNameValid) {
+                    res.status(StatusCodes.OK).json({ userNameError: true })
                 }
-            });
-            res.status(StatusCodes.OK).json("Profile data updated successfully");
+
+                await prisma.user.update({
+                    where: { id: req.user.userId },
+                    data: {
+                        username: userName,
+                        fullName,
+                        description,
+                        isProfileInfoSet: true,
+                    }
+                });
+                res.status(StatusCodes.OK).json("Profile data updated successfully");
+            }
+        } else {
+            throw new CustomError.BadRequestError("UserName, FullName and Description should be included.");
         }
-    } else {
-        throw new CustomError.BadRequestError("UserName, FullName and Description should be included.");
+    } catch (error) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            if (err.code === "P2002") {
+                return res.status(400).json({ userNameError: true });
+            }
+        } else {
+            return res.status(500).send("Internal Server Error");
+        }
+        throw err;
     }
 }
 
@@ -137,7 +148,7 @@ const setUserImage = async (req, res, next) => {
     if (req.file) {
         if (req?.user) {
             const date = Date.now();
-            let fileName = `/uploads/profiles/` + date + req.file.originalname;
+            let fileName = `uploads/profiles/` + date + req.file.originalname;
             fs.renameSync(req.file.path, fileName);
             const prisma = new PrismaClient();
 
