@@ -118,49 +118,45 @@ const setUserInfo = async (req, res, next) => {
       // Get user.
       const user = await prisma.user.findUnique({ where: aggregated })
 
-      // Upload info.
-      if (userName || fullName || description) {
+      // Check if username is already taken.
+      if (userName && userName !== user.username) {
+        const userNameValid = await prisma.user.findUnique({
+          where: { username: userName },
+        });
 
-        // Check if username is already taken.
-        if (userName !== user.username) {
-          const userNameValid = await prisma.user.findUnique({
-            where: { username: userName },
-          });
-
-          // If username is taken, return error.
-          if (userNameValid) {
-            res.status(StatusCodes.OK).json({ userNameError: true })
-          } else {
-            // Update username.
-            await prisma.user.update({
-              where: aggregated,
-              data: { username: userName },
-            });
-          }
-        }
-
-        if (fullName) {
-          // Update fullName.
+        // If username is taken, return error.
+        if (userNameValid) {
+          res.status(StatusCodes.OK).json({ userNameError: true })
+        } else {
+          // Update username.
           await prisma.user.update({
             where: aggregated,
-            data: { fullName },
+            data: { username: userName },
           });
         }
+      }
 
-        if (description) {
-          // Update description.
-          await prisma.user.update({
-            where: aggregated,
-            data: { description },
-          });
-        }
-
-        // Update isProfileInfoSet.
+      if (fullName) {
+        // Update fullName.
         await prisma.user.update({
           where: aggregated,
-          data: { isProfileInfoSet: true }
+          data: { fullName },
         });
       }
+
+      if (description) {
+        // Update description.
+        await prisma.user.update({
+          where: aggregated,
+          data: { description },
+        });
+      }
+
+      // Update isProfileInfoSet.
+      await prisma.user.update({
+        where: aggregated,
+        data: { isProfileInfoSet: true }
+      });
 
       return res.status(StatusCodes.OK).json("Profile data updated successfully");
     } else {
