@@ -2,7 +2,6 @@ const CustomError = require('../errors')
 const { PrismaClient } = require("@prisma/client")
 const { StatusCodes } = require("http-status-codes")
 const fs = require("fs")
-
 const addGig = async (req, res) => {
     if (req.files) {
         const fileKeys = Object.keys(req.files);
