@@ -1,6 +1,6 @@
-require("dotenv").config({
-    path: ".env",
-});
+// require("dotenv").config({
+//     path: ".env",
+// });
 
 console.log(process.env.SERVER_URL);
 
@@ -8,6 +8,7 @@ console.log(process.env.SERVER_URL);
 const nextConfig = {
     reactStrictMode: true,
     images: {
+        domains: ['localhost'],
         remotePatterns: [
             {
                 protocol: "https",

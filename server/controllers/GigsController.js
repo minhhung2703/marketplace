@@ -1,4 +1,4 @@
-const { Prisma, PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 const CustomError = require("../errors");
 const fs = require("fs");
 const { StatusCodes } = require("http-status-codes");
@@ -43,13 +43,64 @@ const addGigs = async (req, res) => {
                         images: fileNames,
                     },
                 });
-
-                return res.status(201).send("Successfully created the gig.");
+                return res.status(StatusCodes.CREATED).json("Successfully created the gig.");
             }
         }
-        return res.status(400).send("All properties should be required.");
+        throw new CustomError.BadRequestError("All properties should be required.");
     } catch (err) {
         console.log(err);
     }
 }
-module.exports = { addGigs }
+
+const getUserAuthGigs = async (req, res) => {
+    if (req.user) {
+        const prisma = new PrismaClient();
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.userId },
+            include: { gigs: true },
+        });
+        return res.status(StatusCodes.CREATED).json({ user })
+    }
+    throw new CustomError.BadRequestError("UserId should be required")
+}
+
+const getGigData = async (req, res, next) => {
+    if (req.params.gigId) {
+        const prisma = new PrismaClient();
+        const gig = await prisma.gigs.findUnique({
+            where: { id: parseInt(req.params.gigId) },
+            include: {
+                reviews: {
+                    include: { reviewer: true },
+                },
+                createdBy: true
+            },
+        });
+        // return res.status(StatusCodes.OK).json(gig)
+
+        const userWithGigs = await prisma.user.findUnique({
+            where: { id: gig?.createdBy.id },
+            include: {
+                gigs: {
+                    include: { reviews: true }
+                },
+            },
+        });
+
+        const totalReviews = userWithGigs.gigs.reduce((acc, gig) => acc + gig.reviews.length, 0);
+
+        const averageRating = (
+            userWithGigs.gigs.reduce(
+                (acc, gig) => acc + gig.reviews.reduce((sum, review) => sum + review.rating, 0), 0
+            ) / totalReviews.totalReviews
+        ).toFixed(1);
+        return res.status(StatusCodes.OK).json({ gig: { ...gig, totalReviews, averageRating } });
+    }
+    throw new CustomError.BadRequestError("GigId should be required")
+}
+
+module.exports = {
+    addGigs,
+    getUserAuthGigs,
+    getGigData
+}
