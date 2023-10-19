@@ -76,7 +76,6 @@ const getGigData = async (req, res, next) => {
                 createdBy: true
             },
         });
-        // return res.status(StatusCodes.OK).json(gig)
 
         const userWithGigs = await prisma.user.findUnique({
             where: { id: gig?.createdBy.id },
@@ -99,8 +98,58 @@ const getGigData = async (req, res, next) => {
     throw new CustomError.BadRequestError("GigId should be required")
 }
 
+const editGig = async (req, res) => {
+    if (req.files) {
+        const fileKeys = Object.keys(req.files);
+        const fileNames = [];
+        fileKeys.forEach((file) => {
+            const date = Date.now();
+            fs.renameSync(
+                req.files[file].path,
+                "uploads/" + date + req.files[file].originalname
+            );
+            fileNames.push(date + req.files[file].originalname);
+        });
+        if (req.query) {
+            const {
+                title,
+                description,
+                category,
+                features,
+                price,
+                revisions,
+                time,
+                shortDesc
+            } = req.query;
+            const prisma = new PrismaClient();
+            const oldData = await prisma.gigs.findUnique({
+                where: { id: parseInt(req.params.gigId) },
+                data: {
+                    title,
+                    description,
+                    deliveryTime: parseInt(time),
+                    category,
+                    features,
+                    price: parseInt(price),
+                    shortDesc,
+                    revisions: parseInt(revisions),
+                    createdBy: { connect: { id: parseInt(req.userId) } },
+                    images: fileNames,
+                },
+            });
+            oldData?.images.forEach((image) => {
+                if (fs.existsSync(`uploads/${image}`)) fs.unlinkSync(`uploads/${image}`);
+            });
+
+            return res.status(StatusCodes.CREATED).json("Successfully Edit the gig");
+        }
+    }
+    throw new CustomError.BadRequestError("All propertives should required");
+}
+
 module.exports = {
     addGigs,
     getUserAuthGigs,
-    getGigData
+    getGigData,
+    editGig
 }
