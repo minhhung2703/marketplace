@@ -124,6 +124,9 @@ const editGig = async (req, res) => {
             const prisma = new PrismaClient();
             const oldData = await prisma.gigs.findUnique({
                 where: { id: parseInt(req.params.gigId) },
+            });
+            await prisma.gigs.update({
+                where: { id: parseInt(req.params.gigId) },
                 data: {
                     title,
                     description,
@@ -137,6 +140,7 @@ const editGig = async (req, res) => {
                     images: fileNames,
                 },
             });
+
             oldData?.images.forEach((image) => {
                 if (fs.existsSync(`uploads/${image}`)) fs.unlinkSync(`uploads/${image}`);
             });
