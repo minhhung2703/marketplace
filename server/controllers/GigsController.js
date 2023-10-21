@@ -181,19 +181,51 @@ const createSearchQuery = (searchTerm, category) => {
     return query;
 };
 
+const checkOrder = async (userId, gigId) => {
+    const prisma = new PrismaClient();
+    const hasUserOrderedGig = await prisma.orders.findFirst({
+        where: {
+            buyerId: parseInt(userId),
+            gigId: parseInt(gigId),
+            isCompleted: true,
+        },
+    });
+    return hasUserOrderedGig;
+}
+
 const checkGigOrder = async (req, res) => {
-    if (req.user && req.params.gigId) {
-        const prisma = new PrismaClient();
-        const hasUserOrderGig = await prisma.orders.findFirst({
-            where: {
-                buyerId: parseInt(req.user.userId),
-                gigId: parseInt(req.params.gigId),
-                isCompleted: true,
-            }
-        })
-        return res.status(StatusCodes.OK).json({ hasUserOrderGig: hasUserOrderGig ? true : false });
+    if (req.user.userId && req.params.gigId) {
+        const hasUserOrderedGig = await checkOrder(req.user.userId, req.params.gigId);
+        return res.status(StatusCodes.OK).json({ hasUserOrderGig: hasUserOrderedGig ? true : false });
     }
     throw new CustomError.BadRequestError("UserId and gigId is required");
+}
+
+const addReview = async (req, res) => {
+    try {
+        if (req.user.userId || req.params.gigId) {
+            if (await checkOrder(req.user.userId, req.params.gigId)) {
+                if (req.body.reviewText && req.body.rating) {
+                    const prisma = new PrismaClient();
+                    const newReview = await prisma.reviews.create({
+                        data: {
+                            rating: req.body.rating,
+                            reviewText: req.body.reviewText,
+                            reviewer: { connect: { id: parseInt(req?.user.userId) } },
+                            gig: { connect: { id: parseInt(req.params.gigId) } }
+                        },
+                        include: { reviewer: true },
+                    });
+                    return res.status(StatusCodes.CREATED).json({ newReview })
+                }
+                throw new CustomError.BadRequestError("ReviewText and Rating are required")
+            }
+            throw new CustomError.BadRequestError("You need to purchase the gig in order to add review.")
+        }
+        throw new CustomError.BadRequestError("userId and gigId is required.")
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 module.exports = {
@@ -202,5 +234,6 @@ module.exports = {
     getGigData,
     editGig,
     searchGigs,
-    checkGigOrder
+    checkGigOrder,
+    addReview
 }
