@@ -25,7 +25,7 @@ const createOrder = async (req, res) => {
             data: {
                 paymentIntent: paymentIntent.id,
                 price: gig?.price,
-                buyer: { connect: { id: req?.userId } },
+                buyer: { connect: { id: req?.user.userId } },
                 gig: { connect: { id: gig?.id } },
             },
         })
