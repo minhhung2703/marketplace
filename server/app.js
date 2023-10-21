@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 // routes
 const authRoute = require("./routes/AuthRoutes");
 const gigsRoute = require("./routes/GigsRoutes");
+const orderRoute = require("./routes/OrderRoutes")
 
 const NotFound = require("./middlewares/not-found");
 const errorHandleMiddlerware = require("./middlewares/error-handler");
@@ -31,7 +32,7 @@ app.get("/", () => console.log("hello"));
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/gigs", gigsRoute);
-
+app.use("/api/v1/orders", orderRoute)
 
 app.use(NotFound);
 app.use(errorHandleMiddlerware);
