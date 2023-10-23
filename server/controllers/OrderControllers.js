@@ -14,11 +14,11 @@ const createOrder = async (req, res) => {
         const gig = await prisma.gigs.findUnique({
             where: { id: parseInt(gigId) },
         });
-        const paymentIntent = await stripe.paymentInternt.create({
+        const paymentIntent = await stripe.paymentIntents.create({
             amount: gig?.price * 100,
             currency: "usd",
             automatic_payment_methods: {
-                enable: true,
+                enabled: true,
             },
         });
         await prisma.orders.create({
