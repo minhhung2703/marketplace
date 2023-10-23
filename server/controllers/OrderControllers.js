@@ -37,6 +37,58 @@ const createOrder = async (req, res) => {
     }
 }
 
+const confirmOrder = async (req, res) => {
+    if (req.body.paymentIntent) {
+        const prisma = new PrismaClient();
+        const confirm = await prisma.orders.update({
+            where: { paymentIntent: req.body.paymentIntent },
+            data: { isCompleted: true }
+        })
+        res.status(StatusCodes.CREATED).json({ confirm })
+    }
+}
+
+const getBuyerOrders = async (req, res) => {
+    if (req.user) {
+        const prisma = new PrismaClient();
+        const orders = await prisma.orders.findMany({
+            where: { buyerId: req.user.userId, isCompleted: true },
+            include: { gig: true }
+        });
+        res.status(StatusCodes.OK).json({ orders })
+    }
+}
+
+const getSellerOrders = async (req, res) => {
+    try {
+        if (req.user) {
+            const prisma = new PrismaClient();
+            const orders = await prisma.orders.findMany({
+                where: {
+                    gig: {
+                        createdBy: {
+                            id: parseInt(req.user.userId),
+                        },
+                    },
+                    isCompleted: true,
+                },
+                include: {
+                    gig: true,
+                    buyer: true,
+                },
+            });
+            return res.status(StatusCodes.OK).json({ orders })
+        }
+        throw new CustomError.BadRequestError("userId is required")
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
 module.exports = {
-    createOrder
+    createOrder,
+    confirmOrder,
+    getBuyerOrders,
+    getSellerOrders
 }
