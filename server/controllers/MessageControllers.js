@@ -13,14 +13,10 @@ const addMessage = async (req, res) => {
         const message = await prisma.message.create({
             data: {
                 sender: {
-                    connect: {
-                        id: parseInt(req.user.userId),
-                    },
+                    connect: { id: parseInt(req.user.userId), },
                 },
                 recipient: {
-                    connect: {
-                        id: parseInt(req.body.recipentId),
-                    },
+                    connect: { id: parseInt(req.body.recipentId), },
                 },
                 text: req.body.message,
             },
@@ -30,6 +26,23 @@ const addMessage = async (req, res) => {
     throw new CustomError.BadRequestError("UserId, recipentId and message is required")
 }
 
+const getMessages = async (req, res) => {
+    if (req.params.orderId && req.user.userId) {
+        const prisma = new PrismaClient();
+        const messages = await prisma.message.findMany({
+            where: {
+                order: {
+                    id: parseInt(req.params.orderId),
+                },
+            },
+            orderBy: {
+                createdAt: "asc",
+            },
+        });
+    }
+}
+
 module.exports = {
-    addMessage
+    addMessage,
+    getMessages,
 }
