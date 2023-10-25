@@ -13,6 +13,7 @@ const authRoute = require("./routes/AuthRoutes");
 const gigsRoute = require("./routes/GigsRoutes");
 const orderRoute = require("./routes/OrderRoutes")
 const messageRoute = require("./routes/MessagesRoutes")
+const dashboardRoute = require("./routes/DashboardRoutes")
 
 const NotFound = require("./middlewares/not-found");
 const errorHandleMiddlerware = require("./middlewares/error-handler");
@@ -35,6 +36,7 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/gigs", gigsRoute);
 app.use("/api/v1/orders", orderRoute)
 app.use("/api/v1/messages", messageRoute)
+app.use("/api/v1/dashboard", dashboardRoute)
 
 app.use(NotFound);
 app.use(errorHandleMiddlerware);
