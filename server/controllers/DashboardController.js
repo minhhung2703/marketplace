@@ -85,7 +85,7 @@ const getSellerData = async (req, res) => {
                 dashboardData: {
                     orders,
                     gigs,
-                    unreadMessages,
+                    unReadMessages,
                     dailyRevenue,
                     monthlyRevenue,
                     revenue,
